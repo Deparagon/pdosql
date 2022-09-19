@@ -3,7 +3,7 @@
 /**
  * DESCRIPTION.
  *
- * DB 
+ * DB
  *
  *  @author    Paragon Kingsley
  *  @copyright 2016 Paragon Kingsley
@@ -37,14 +37,14 @@ class Db
             $this->dbcon = new PDO($this->dsn, self::DATABASEUSER, self::DATABASEPASSWORD);
             $this->dbcon->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            // for developmental purpose, 
+            // for developmental purpose,
             echo 'Connection failed: '.$e->getMessage();
         }
     }
 
-    /** 
+    /**
      *Inserts a record into a database table.
-     
+
      * @param $this->tablename string database table name
      * @param $arraypair  Array key : value pair of all the database fields to insert.
      * @param $datatype Array array of the field type, 's' for string 'i' for int
@@ -91,9 +91,9 @@ class Db
         }
     }
 
-    /** 
+    /**
      *Inserts a record into a database table.
-     
+
      * @param $tablename string database table name
      * @param $arraypair  Array key : value pair of all the database fields to insert.
      * @param $datatype Array array of the field type, 's' for string 'i' for int
@@ -140,59 +140,59 @@ class Db
         }
     }
 
- /** 
+ /**
   *updates a record in a database table.
-  
+
   * @param $tablename string database table name
   * @param $args  Array key : value (new value) pair of all the database fields to update.
   * @param $where Array key : value pair of the where fields.
   *
   * @return Bool(T|F)
   */
- public function update($newvar, $where)
- {
-     if (!is_array($newvar) || !is_array($where)) {
-         return;
-     }
+    public function update($newvar, $where)
+    {
+        if (!is_array($newvar) || !is_array($where)) {
+            return;
+        }
 
-     if (!empty($where)) {
-         foreach ($where as $k => $v) {
-             $holder[] = $k.'=:'.$k;
-             $datavalue[':'.$k] = $v;
-         }
-         $wheredata = ' WHERE '.implode(' AND ', $holder);
-     }
+        if (!empty($where)) {
+            foreach ($where as $k => $v) {
+                $holder[] = $k.'=:'.$k;
+                $datavalue[':'.$k] = $v;
+            }
+            $wheredata = ' WHERE '.implode(' AND ', $holder);
+        }
 
-    // print_r($newvar);
-     //echo'<br>';
-     foreach ($newvar as $k => $v) {
-         //$columns[] = $k;
+       // print_r($newvar);
+        //echo'<br>';
+        foreach ($newvar as $k => $v) {
+            //$columns[] = $k;
             $updatables[] = $k.'=:'.$k;
-         $data[':'.$k] = $v;
-     }
-     try {
-         $sql = 'UPDATE '.$this->tablename.' SET '.implode(',', $updatables).' '.$wheredata;
-         //echo $sql;
-         $stmt = $this->dbcon->prepare($sql);
-         foreach ($data as $key => $value) {
-             $stmt->bindValue($key, $value);
-         }
-         foreach ($datavalue as $key => $value) {
-             $stmt->bindValue($key, $value);
-         }
-         if ($stmt->execute()) {
-             return true;
-         }
+            $data[':'.$k] = $v;
+        }
+        try {
+            $sql = 'UPDATE '.$this->tablename.' SET '.implode(',', $updatables).' '.$wheredata;
+            //echo $sql;
+            $stmt = $this->dbcon->prepare($sql);
+            foreach ($data as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            foreach ($datavalue as $key => $value) {
+                $stmt->bindValue($key, $value);
+            }
+            if ($stmt->execute()) {
+                return true;
+            }
 
-         return false;
-     } catch (PDOException $e) {
-         $e->getMessage().'. Update Failed';
-     }
- }
+            return false;
+        } catch (PDOException $e) {
+            $e->getMessage().'. Update Failed';
+        }
+    }
 
-    /** 
+    /**
      *deletes record(s)in a database table.
-     
+
      * @param $this->tablename string database table name
      * @param $where  Array key : value pair of all the database fields to delete.
      *
@@ -218,9 +218,9 @@ class Db
         return false;
     }
 
-    /** 
+    /**
      *select(s) record(s) from a database(s) table.
-     
+
      * @param $nonwhere string contains a part of the sql query before the where clause
      * @param $where  Array key : value pair of the where fields.
      * @param $mode string, type of values to return, OBJ for objects and ASSOC for associative array of the fields and field value
@@ -229,8 +229,11 @@ class Db
      * @return array of object, array, false)
      *               Example: ('SELECT * FROM '.self::DTABLE, array('idUser' => $idUser, 'orderState' => $state))
      */
-    public function doSelection($nonwhere, $where = array(), $mode = '', $orderby = '')
+    public function doSelection($nonwhere = '', $where = array(), $mode = '', $orderby = '')
     {
+        if ($nonwhere =='') {
+            $nonwhere ='SELECT * FROM ';
+        }
         if (!empty($where)) {
             foreach ($where as $k => $v) {
                 if (stripos($k, '.')) {
@@ -271,9 +274,9 @@ class Db
         return false;
     }
 
-    /** 
+    /**
      *executes sql and returns Object.
-     
+
      * @param $sql string $sql  the complete sql query
      *
      * @return OBJect
@@ -288,9 +291,9 @@ class Db
         }
     }
 
-    /** 
+    /**
      * searchs through the database table ;.
-     
+
      * @param $sql string SQL with placeholders see sample
      * @param $value  Array value of in placeholder
      *
@@ -310,9 +313,9 @@ class Db
         return $result;
     }
 
-    /** 
+    /**
      *Returns single column field.
-     
+
      * @param $nonwhere string $sql query string before the WHERE clause.
      * @param $where Array the WHERE field(s) array key : value page
      *
@@ -345,15 +348,15 @@ class Db
         return false;
     }
 
-    /** 
+    /**
      *Returns single row field.
-     
+
      * @param $nonwhere string $sql query string before the WHERE clause.
      * @param $where Array the WHERE field(s) array key : value page
      * @param $mode string OBJ / ASSOC for object/associative array
      *
      * @return object or associate array depending on mode
-     *                Example: 
+     *                Example:
      */
     public function getRow($nowhere, $where, $sqljoin = '', $mode = '')
     {
@@ -397,15 +400,15 @@ class Db
         return false;
     }
 
-    /** 
+    /**
      *Returns single row field.
-     
+
      * @param $nonwhere string $sql query string before the WHERE clause.
      * @param $where Array the WHERE field(s) array key : value page
      * @param $mode string OBJ / ASSOC for object/associative array
      *
      * @return object or associate array depending on mode
-     *                Example: 
+     *                Example:
      */
     public function getRowJoin($nowhere, $join, $where, $mode = '')
     {
@@ -435,9 +438,9 @@ class Db
         return false;
     }
 
-    /** 
+    /**
      *Returns single column field.
-     
+
      * @param $fieldname string the name of the field to return.
      * @param $tablename string the name of the database table
      * @param $where Array the WHERE field(s) array key : value page
